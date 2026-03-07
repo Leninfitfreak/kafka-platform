@@ -1,0 +1,58 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+ssl: false
+whitelistObjectNames:
+  - kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,*
+  - kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,*
+  - kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,*
+  - kafka.network:type=RequestMetrics,name=TotalTimeMs,*
+  - kafka.server:type=FetcherLagMetrics,name=ConsumerLag,*
+  - kafka.consumer:type=consumer-fetch-manager-metrics,*
+rules:
+  - pattern: 'kafka.server<type=BrokerTopicMetrics, name=(MessagesInPerSec|BytesInPerSec|BytesOutPerSec), topic=(.+)><>Count'
+    name: kafka_server_brokertopicmetrics_$1_count
+    labels:
+      topic: "$2"
+    type: COUNTER
+  - pattern: 'kafka.server<type=BrokerTopicMetrics, name=(MessagesInPerSec|BytesInPerSec|BytesOutPerSec)><>Count'
+    name: kafka_server_brokertopicmetrics_$1_count
+    type: COUNTER
+  - pattern: 'kafka.network<type=RequestMetrics, name=TotalTimeMs, request=(.+)><>Mean'
+    name: kafka_network_requestmetrics_totaltimems_mean
+    labels:
+      request: "$1"
+    type: GAUGE
+  - pattern: 'kafka.network<type=RequestMetrics, name=TotalTimeMs, request=(.+)><>(\d+)thPercentile'
+    name: kafka_network_requestmetrics_totaltimems_percentile
+    labels:
+      request: "$1"
+      quantile: "0.$2"
+    type: GAUGE
+  - pattern: 'kafka.server<type=FetcherLagMetrics, name=ConsumerLag, clientId=(.+), topic=(.+), partition=(.+)><>Value'
+    name: kafka_consumer_records_lag
+    labels:
+      client_id: "$1"
+      topic: "$2"
+      partition: "$3"
+    type: GAUGE
+  - pattern: 'kafka.consumer<type=consumer-fetch-manager-metrics, client-id=(.+), topic=(.+), partition=(.+)><>fetch-latency-avg'
+    name: kafka_consumer_fetch_latency
+    labels:
+      client_id: "$1"
+      topic: "$2"
+      partition: "$3"
+    type: GAUGE
+  - pattern: 'kafka.consumer<type=consumer-fetch-manager-metrics, client-id=(.+), topic=(.+), partition=(.+)><>records-lag'
+    name: kafka_consumer_records_lag
+    labels:
+      client_id: "$1"
+      topic: "$2"
+      partition: "$3"
+    type: GAUGE
+  - pattern: 'kafka.(.+)<type=(.+), name=(.+)><>Value'
+    name: kafka_$1_$2_$3
+    type: GAUGE
+  - pattern: 'kafka.(.+)<type=(.+), name=(.+)><>Count'
+    name: kafka_$1_$2_$3_count
+    type: COUNTER

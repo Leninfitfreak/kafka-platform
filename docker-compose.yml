@@ -1,10 +1,14 @@
 services:
   kafka:
-    image: confluentinc/cp-kafka:7.6.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: leninkart/kafka-platform:local
     container_name: kafka-platform
     restart: unless-stopped
     ports:
       - "9092:9092"
+      - "7071:7071"
     extra_hosts:
       - "host.minikube.internal:host-gateway"
     environment:
@@ -23,13 +27,25 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_OPTS: "-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/etc/jmx-exporter/jmx_exporter_config.yml"
     volumes:
       - kafka_data:/var/lib/kafka/data
+      - ./jmx_exporter_config.yml:/etc/jmx-exporter/jmx_exporter_config.yml:ro
     healthcheck:
       test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      default:
+      signoz-net:
+        aliases:
+          - kafka
+          - kafka-platform
 
 volumes:
   kafka_data:
+
+networks:
+  signoz-net:
+    external: true
