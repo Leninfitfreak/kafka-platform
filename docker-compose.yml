@@ -32,7 +32,7 @@ services:
       - kafka_data:/var/lib/kafka/data
       - ./jmx_exporter_config.yml:/etc/jmx-exporter/jmx_exporter_config.yml:ro
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "env -u KAFKA_OPTS kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 20
