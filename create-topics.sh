@@ -14,6 +14,7 @@ create_topic() {
     --replication-factor 1
 }
 
+create_topic "product-orders"
 create_topic "product-events"
 create_topic "order-events"
 create_topic "order-created"

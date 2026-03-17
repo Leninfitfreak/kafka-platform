@@ -10,14 +10,14 @@ services:
       - "9092:9092"
       - "7071:7071"
     extra_hosts:
-      - "host.minikube.internal:host-gateway"
+      - "host.k3d.internal:host-gateway"
     environment:
       KAFKA_NODE_ID: "1"
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
       KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://host.minikube.internal:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://host.k3d.internal:9092"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka-platform:9093"
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
       CLUSTER_ID: "7W9Qh1P0T9u8i6X4k2M3N5"
@@ -27,10 +27,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
-      KAFKA_OPTS: "-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/etc/jmx-exporter/jmx_exporter_config.yml"
     volumes:
       - kafka_data:/var/lib/kafka/data
       - ./jmx_exporter_config.yml:/etc/jmx-exporter/jmx_exporter_config.yml:ro
+      - ./create-topics.sh:/usr/local/bin/create-topics.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "env -u KAFKA_OPTS kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 10s
