@@ -27,6 +27,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_OPTS: "-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent.jar=7071:/etc/jmx-exporter/jmx_exporter_config.yml"
     volumes:
       - kafka_data:/var/lib/kafka/data
       - ./jmx_exporter_config.yml:/etc/jmx-exporter/jmx_exporter_config.yml:ro
