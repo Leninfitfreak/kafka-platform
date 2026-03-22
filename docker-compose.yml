@@ -33,8 +33,8 @@ services:
       - ./jmx_exporter_config.yml:/etc/jmx-exporter/jmx_exporter_config.yml:ro
       - ./create-topics.sh:/usr/local/bin/create-topics.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "env -u KAFKA_OPTS kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
-      interval: 10s
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 30s
       timeout: 5s
       retries: 20
     networks:
